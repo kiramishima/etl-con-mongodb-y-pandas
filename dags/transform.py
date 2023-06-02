@@ -16,7 +16,7 @@ def get_df(paths, **kwargs):
         
     return df
 
-def load_data_to_pandas():
+def load_data_to_pandas(ti):
     """ Carga toda la información al Dataframe """
     dir_path = "/mnt/d/Workspace/ws_python/etl_irc/csv"
     # Cargamos la información de todas las plantas y sensores
@@ -24,4 +24,6 @@ def load_data_to_pandas():
     weather = get_df(["{}/Plant_{}_Weather_Sensor_Data.csv".format(dir_path, i) for i in range(1,3)], parse_dates=["DATE_TIME"])
 
     df = plant.merge(weather, on=["DATE_TIME", "PLANT_ID"], suffixes=("_GENERATION", "_WEATHER"))
-    return df
+    df.reset_index(inplace=True)
+    print(df.to_dict("records"))
+    ti.xcom_push(key='data', value=df.to_dict("records"))
